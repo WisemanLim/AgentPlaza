@@ -1,0 +1,22 @@
+# 선택 오버레이 — CLI 에이전트 브리지(D1-04 CLI 백엔드, D7-06 ACP). 플랫폼에는 'OpenAI 호환 서버'로 등록한다:
+#   PUT /api/llm/servers/cli {"base_url": "http://cli-bridge:8787/v1", "local": false, "api_key": "<BRIDGE_TOKEN>"}
+# CLI 는 공급사 클라우드로 나가므로 local=false — L2 이상 데이터는 정책상 이 백엔드로 가지 않는다.
+# 기본 CLI_BRIDGE_BACKENDS 는 시험용 가짜 CLI 2개(ndjson·acp). 실제 CLI 는 Dockerfile 빌드 인자로 설치 후 값을 바꾼다.
+services:
+  cli-bridge:
+    build: { context: ., dockerfile: bridge/Dockerfile }
+    image: wise-agentplaza-cli-bridge:${APP_ENV:-local}
+    environment:
+      BRIDGE_TOKEN: ${BRIDGE_TOKEN:?BRIDGE_TOKEN 필요 / required}
+      CLI_BRIDGE_BACKENDS: ${CLI_BRIDGE_BACKENDS:-{"fake-claude":{"cmd":["python","/srv/fake/fake_claude.py","{prompt}"],"protocol":"ndjson"},"fake-acp":{"cmd":["python","/srv/fake/fake_acp.py"],"protocol":"acp"}}}
+    volumes: ["cli-home:/home/bridge"]  # CLI 로그인 정보(사용자가 직접 로그인)
+    read_only: true
+    tmpfs: ["/tmp"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    deploy: { resources: { limits: { cpus: "2", memory: 2G, pids: 256 } } }
+    labels:
+      agentplaza.project: ${PLAZA_PROJECT:-plaza}
+    restart: unless-stopped
+volumes:
+  cli-home:

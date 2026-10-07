@@ -1,0 +1,23 @@
+# 선택 오버레이(D8-05): Linux GPU 서버에서 Ollama 를 컨테이너로. GPU 예약은 LLM 공급자만(에이전트 린트는 장치 예약 거부).
+# macOS(Apple Silicon)는 Docker 에서 Metal 을 못 쓰므로 호스트 네이티브 Ollama 브리지를 쓴다(PRD R10, T3).
+# 사용: ... -f compose-optional/ollama-gpu.yml  그리고 OLLAMA_BASE_URL=http://ollama:11434
+services:
+  ollama:
+    image: ollama/ollama:latest
+    volumes: ["ollama-models:/root/.ollama"]   # 모델 캐시 볼륨 공유
+    environment:
+      OLLAMA_KEEP_ALIVE: 30m
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+volumes:
+  ollama-models:

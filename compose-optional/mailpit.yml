@@ -1,0 +1,12 @@
+# 알림 메일 시험용 SMTP(D10-07) — 받은 메일을 보관만 하고 밖으로 보내지 않는다. 운영에서는 쓰지 않는다.
+# 사용: docker compose … -f compose-optional/mailpit.yml up -d mailpit → 콘솔 알림 채널(메일) host=mailpit port=1025 tls=none
+#       받은 메일 확인: http://127.0.0.1:8025
+services:
+  mailpit:
+    image: axllent/mailpit:v1.31.4
+    ports: ["127.0.0.1:8025:8025"]   # 웹 UI(로컬만). SMTP 1025 는 compose 네트워크 안에서만
+    environment:
+      MP_MAX_MESSAGES: "500"
+    labels:
+      agentplaza.project: ${PLAZA_PROJECT:-plaza}
+    restart: unless-stopped

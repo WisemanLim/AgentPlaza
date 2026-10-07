@@ -1,0 +1,14 @@
+# 선택 오버레이 — 교차 인코더 재정렬(D1-07): HuggingFace TEI + BAAI/bge-reranker-v2-m3(Apache-2.0).
+# 사용: docker compose … -f compose-optional/tei.yml up -d  그리고 .env 에 TEI_RERANK_URL=http://tei-rerank:80
+# 없으면 게이트웨이가 임베딩 코사인으로 재정렬한다. 모델은 첫 기동 때 내려받는다(폐쇄망은 tei-models 볼륨을 미리 채움).
+services:
+  tei-rerank:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
+    command: ["--model-id", "BAAI/bge-reranker-v2-m3", "--port", "80"]
+    volumes: ["tei-models:/data"]
+    deploy: { resources: { limits: { cpus: "2", memory: 4G } } }
+    labels:
+      agentplaza.project: ${PLAZA_PROJECT:-plaza}
+    restart: unless-stopped
+volumes:
+  tei-models:

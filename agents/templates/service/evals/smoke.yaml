@@ -1,0 +1,8 @@
+- id: wordcount
+  capability: process
+  args: {text: "a b c", op: wordcount}
+  expect: {equals: {words: 3, chars: 5}}
+- id: upper
+  capability: process
+  args: {text: "hi", op: upper}
+  expect: {equals: {text: "HI"}}

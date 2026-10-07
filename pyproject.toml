@@ -1,0 +1,43 @@
+[project]
+name = "wise-agentplaza"
+version = "0.1.0"
+description = "wise-agentplaza — FastAPI service"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "pydantic>=2.7",
+  "pydantic-settings>=2.3",
+  "sqlalchemy>=2.0",
+  "alembic>=1.13",
+  "psycopg[binary]>=3.2",
+  "pyjwt>=2.9",
+  "cryptography>=43",
+  "python-multipart>=0.0.9",
+  "pyyaml>=6",
+  "jsonschema>=4.23",
+  "httpx>=0.27",
+  "sqlglot>=25",
+  "langgraph>=0.2",
+  "langgraph-checkpoint-sqlite>=2",
+  "langgraph-checkpoint-postgres>=2",
+  "mcp>=2.3",
+  "a2a-sdk[http-server]>=1.2",
+  "opentelemetry-api>=1.27",
+  "opentelemetry-sdk>=1.27",
+  "opentelemetry-exporter-otlp-proto-http>=1.27",
+  "redis>=5",
+  "pypdf>=5",
+  "pydantic-ai-slim>=1.0,<2",  # Assistant 에이전트 SDK(PRD Q2, MIT) — 공급자 SDK 없이 코어만
+]
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+# 모든 테스트는 test/ 로 통일 (시험표준 dev-env/impl 도 test/ 하위)
+[tool.pytest.ini_options]
+testpaths = ["test"]
+pythonpath = [".", "sdk/python"]
+
+[tool.uv]
+package = false

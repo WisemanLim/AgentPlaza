@@ -1,0 +1,464 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentplaza.local/schemas/agent.schema.json",
+  "title": "AgentPlaza agent.yaml (apiVersion agentplaza/v1)",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "spec"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "i18n": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+          }
+        }
+      ]
+    },
+    "capability": {
+      "type": "object",
+      "required": [
+        "verb",
+        "domain",
+        "description"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "verb": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,40}$"
+        },
+        "domain": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,80}$"
+        },
+        "description": {
+          "$ref": "#/$defs/i18n"
+        },
+        "inputSchema": {
+          "type": "object"
+        },
+        "outputSchema": {
+          "type": "object"
+        },
+        "humanApprovalRequired": {
+          "type": "boolean"
+        },
+        "qos": {
+          "type": "object",
+          "properties": {
+            "maxLatencyMs": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "supportsAsync": {
+              "type": "boolean"
+            },
+            "supportsStreaming": {
+              "type": "boolean"
+            }
+          }
+        },
+        "idempotent": {
+          "type": "boolean",
+          "description": "같은 입력으로 다시 실행해도 안전 — 일시 장애(5xx·시간 초과) 시 재시도 대상(D2-07)"
+        },
+        "compensation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "capability"
+          ],
+          "description": "보상(사가, D2-07): 뒤 단계가 실패하면 이 capability 로 되돌린다. args 는 {{result.x}}·{{args.x}} 템플릿",
+          "properties": {
+            "capability": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,40}$"
+            },
+            "args": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    }
+  },
+  "properties": {
+    "apiVersion": {
+      "const": "agentplaza/v1"
+    },
+    "kind": {
+      "const": "Agent"
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "version",
+        "license"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{1,40}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "displayName": {
+          "$ref": "#/$defs/i18n"
+        },
+        "description": {
+          "$ref": "#/$defs/i18n"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$"
+        },
+        "publisher": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            },
+            "keyId": {
+              "type": "string"
+            }
+          }
+        },
+        "license": {
+          "type": "string",
+          "minLength": 1
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "provenance": {
+          "type": "object",
+          "properties": {
+            "baseAgent": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "baseVersion": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "derivedAt": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "convertedFrom": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "spec": {
+      "type": "object",
+      "required": [
+        "type",
+        "capabilities"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "app",
+            "service",
+            "rag",
+            "tool-proxy",
+            "reviewer",
+            "execution",
+            "hitl",
+            "memory",
+            "federation"
+          ]
+        },
+        "platform": {
+          "type": "object",
+          "properties": {
+            "min": {
+              "type": "string"
+            }
+          }
+        },
+        "industry": {
+          "type": "string"
+        },
+        "work": {
+          "type": "string"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/capability"
+          }
+        },
+        "governance": {
+          "type": "object",
+          "properties": {
+            "dataClassification": {
+              "enum": [
+                "public",
+                "internal",
+                "confidential"
+              ]
+            },
+            "humanApprovalRequired": {
+              "type": "boolean"
+            },
+            "auditLevel": {
+              "enum": [
+                "minimal",
+                "standard",
+                "full"
+              ]
+            }
+          }
+        },
+        "protocols": {
+          "type": "object"
+        },
+        "llm": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": "boolean"
+            },
+            "alias": {
+              "type": "string",
+              "pattern": "^plaza/[a-z0-9._/-]+$"
+            },
+            "localOk": {
+              "type": "boolean"
+            },
+            "minContext": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "features": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "env": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_]*$"
+              }
+            },
+            "optional": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_]*$"
+              }
+            },
+            "secretRefs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "permissions": {
+          "type": "object",
+          "properties": {
+            "network": {
+              "type": "object",
+              "properties": {
+                "egress": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "fs": {
+              "type": "object"
+            },
+            "docker": {
+              "type": "boolean"
+            }
+          }
+        },
+        "resources": {
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "pattern": "^\\d+(\\.\\d+)?m?$"
+            },
+            "memory": {
+              "type": "string",
+              "pattern": "^\\d+(Mi|Gi)$"
+            },
+            "pids": {
+              "type": "integer",
+              "minimum": 16,
+              "maximum": 4096
+            }
+          }
+        },
+        "runtime": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "enum": [
+                "container",
+                "inprocess"
+              ]
+            },
+            "healthcheck": {
+              "type": "object"
+            }
+          }
+        },
+        "ui": {
+          "type": "object",
+          "properties": {
+            "hasFrontend": {
+              "type": "boolean"
+            },
+            "mount": {
+              "enum": [
+                "iframe",
+                "module-federation",
+                "none"
+              ]
+            },
+            "route": {
+              "type": "string"
+            },
+            "navVisible": {
+              "type": "boolean"
+            }
+          }
+        },
+        "db": {
+          "type": "object",
+          "properties": {
+            "engine": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "sqlite",
+                  "postgres"
+                ]
+              }
+            },
+            "isolation": {
+              "enum": [
+                "own",
+                "shared-schema",
+                "file"
+              ]
+            },
+            "migrations": {
+              "type": "string"
+            }
+          }
+        },
+        "federation": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "enum": [
+                "a2a",
+                "mcp",
+                "openapi"
+              ]
+            },
+            "url": {
+              "type": "string",
+              "pattern": "^https?://"
+            }
+          },
+          "required": [
+            "kind",
+            "url"
+          ]
+        },
+        "compat": {
+          "type": "object",
+          "properties": {
+            "topologies": {
+              "type": "array",
+              "items": {
+                "pattern": "^T[1-6]$"
+              }
+            }
+          }
+        },
+        "dependencies": {
+          "type": "array"
+        },
+        "optionalServices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tests": {
+          "type": "array"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+# 선택 오버레이(D8-03 TLS): Let's Encrypt. compose/ 가 아니라 자동 포함되지 않는다.
+# 사용: docker compose -f docker-compose.yml -f docker-compose.prod.yml -f compose-optional/traefik-acme.yml --env-file .env.prod up -d
+services:
+  traefik:
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.constraints=Label(`agentplaza.project`,`${PLAZA_PROJECT:-plaza}`)
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http.tls.certresolver=le
+      - --certificatesresolvers.le.acme.email=${ACME_EMAIL:?ACME_EMAIL 필요}
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.le.acme.tlschallenge=true
+      - --ping=true
+      - --log.level=${TRAEFIK_LOG_LEVEL:-INFO}
+    ports: ["80:80", "443:443"]
+    volumes: ["/var/run/docker.sock:/var/run/docker.sock:ro", "letsencrypt:/letsencrypt"]
+volumes:
+  letsencrypt:

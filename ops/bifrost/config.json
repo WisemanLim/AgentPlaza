@@ -1,0 +1,16 @@
+{
+  "$schema": "https://www.getbifrost.ai/schema",
+  "config_store": {"enabled": false},
+  "logs_store": {"enabled": false},
+  "providers": {
+    "ollama": {
+      "keys": [{"name": "ollama-local", "value": "", "models": ["*"], "weight": 1.0,
+                "ollama_key_config": {"url": "env.OLLAMA_BASE_URL"}}],
+      "network_config": {"allow_private_network": true, "default_request_timeout_in_seconds": 300}
+    },
+    "openai": {"keys": [{"name": "openai", "value": "env.OPENAI_API_KEY", "models": ["*"], "weight": 1.0}]},
+    "anthropic": {"keys": [{"name": "anthropic", "value": "env.ANTHROPIC_API_KEY", "models": ["*"], "weight": 1.0}]},
+    "gemini": {"keys": [{"name": "gemini", "value": "env.GEMINI_API_KEY", "models": ["*"], "weight": 1.0}]},
+    "openrouter": {"keys": [{"name": "openrouter", "value": "env.OPENROUTER_API_KEY", "models": ["*"], "weight": 1.0}]}
+  }
+}

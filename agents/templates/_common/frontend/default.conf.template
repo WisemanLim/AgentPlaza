@@ -1,0 +1,11 @@
+server {
+  listen 8080;
+  root /usr/share/nginx/html;
+  add_header Content-Security-Policy "frame-ancestors ${CONSOLE_ORIGIN}" always;
+  add_header X-Content-Type-Options nosniff always;
+  location /api/ {
+    proxy_pass ${AGENT_BACKEND}/api/;
+    proxy_set_header x-api-key "${AGENT_API_KEY}";
+  }
+  location / { try_files $uri /index.html; }
+}

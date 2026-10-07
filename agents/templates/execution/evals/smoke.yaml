@@ -1,0 +1,4 @@
+- id: multiply
+  capability: calculate
+  args: {expression: "6*7"}
+  expect: {equals: {value: 42}}

@@ -1,0 +1,124 @@
+# wise-agentplaza — 공통 정의 (모드별 오버레이와 함께 사용: make local-all | make prod-all)
+# api(플랫폼·게이트웨이) · runtime(에이전트 빌드·기동, docker.sock 보유) · traefik(단일 진입점, D8-03)
+services:
+  api:
+    build: { context: ., dockerfile: Dockerfile, target: runtime }
+    image: wise-agentplaza-api:${APP_ENV:-local}
+    ports: ["${BIND_HOST:-127.0.0.1}:${API_PORT:-8000}:8000"]
+    # trivycache: 취약점 DB(약 1.3GB, make trivy-db 로 받음) — 이미지에 넣지 않는다
+    volumes: ["appdata:/app/data", "trivycache:/var/cache/trivy"]
+    # 호스트 네이티브 Ollama 브리지(T3 Apple Silicon, PRD R10). Linux 는 host-gateway 로 같은 이름을 쓴다.
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    # 공급자 호출은 Bifrost 경유(PRD Q1) — 퍼블릭 LLM 키는 bifrost 서비스만 가진다(env_file 값을 비워 덮어쓴다)
+    environment:
+      BIFROST_URL: ${BIFROST_URL:-http://bifrost:8080}
+      OPENAI_API_KEY: ""
+      ANTHROPIC_API_KEY: ""
+      GEMINI_API_KEY: ""
+      OPENROUTER_API_KEY: ""
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health').status==200 else 1)"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+    labels:
+      agentplaza.project: ${PLAZA_PROJECT:-plaza}
+      traefik.enable: "true"
+      traefik.docker.network: ${PLAZA_PROJECT:-plaza}_default
+      traefik.http.routers.plaza-api.entrypoints: web
+      traefik.http.routers.plaza-api.rule: PathPrefix(`/api`) || PathPrefix(`/v1`) || PathPrefix(`/mcp`) || PathPrefix(`/registry`) || PathPrefix(`/widget`) || PathPrefix(`/.well-known`) || Path(`/health`) || PathRegexp(`^/a/[a-z0-9-]+/(a2a|\.well-known/|mcp/server\.json)`)
+      traefik.http.services.plaza-api.loadbalancer.server.port: "8000"
+      # forwardAuth: /a/{agent}/… 는 api 가 사용자를 확인하고 에이전트 내부 키를 주입한다(키는 클라이언트에 노출 안 됨)
+      traefik.http.middlewares.plaza-auth.forwardauth.address: http://api:8000/api/auth/forward
+      traefik.http.middlewares.plaza-auth.forwardauth.authResponseHeaders: X-Api-Key,X-Plaza-User
+
+  bifrost:
+    # LLM 공급자 게이트웨이 엔진(Apache-2.0, PRD Q1): 플랫폼 /v1 의 별칭·데이터 등급·계량·예산 정책 뒤에서 Ollama·퍼블릭을 부른다.
+    # 포트를 열지 않는다(api 만 호출). 설정은 파일 전용(config/logs store 끔), 퍼블릭 키는 여기만 주입.
+    image: maximhq/bifrost:v2.2.6
+    environment:
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      LOG_LEVEL: warn
+    volumes: ["bifrostdata:/app/data", "./ops/bifrost/config.json:/app/data/config.json:ro"]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+    labels:
+      agentplaza.project: ${PLAZA_PROJECT:-plaza}
+    restart: unless-stopped
+
+  runtime:
+    build: { context: ., dockerfile: runtime/Dockerfile }
+    image: wise-agentplaza-runtime:${APP_ENV:-local}
+    environment:
+      RUNTIME_TOKEN: ${RUNTIME_TOKEN:?RUNTIME_TOKEN 필요 / required}
+      PLAZA_PROJECT: ${PLAZA_PROJECT:-plaza}
+      DATA_DIR: /app/data
+      HELPER_IMAGE: wise-agentplaza-runtime:${APP_ENV:-local}  # 볼륨 백업·복원용(자기 이미지 — 오프라인에서도 있음)
+    # docker.sock 은 이 컨테이너(그리고 읽기 전용으로 traefik)만 가진다 — api·에이전트는 금지(NFR-I3)
+    volumes: ["/var/run/docker.sock:/var/run/docker.sock", "appdata:/app/data"]
+    labels:
+      agentplaza.project: ${PLAZA_PROJECT:-plaza}
+    restart: unless-stopped
+
+  traefik:
+    image: traefik:v3
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.constraints=Label(`agentplaza.project`,`${PLAZA_PROJECT:-plaza}`)
+      - --entrypoints.web.address=:80
+      # Addon UI 전용 진입점: 콘솔과 다른 오리진(포트)으로 띄워 신뢰하지 않는 화면이 콘솔 토큰·DOM 에 닿지 못하게 한다(PRD 13.1)
+      - --entrypoints.apps.address=:81
+      - --ping=true
+      - --log.level=${TRAEFIK_LOG_LEVEL:-INFO}
+    ports: ["${BIND_HOST:-127.0.0.1}:${GATEWAY_PORT:-8090}:80", "${BIND_HOST:-127.0.0.1}:${APPS_PORT:-8092}:81"]
+    volumes: ["/var/run/docker.sock:/var/run/docker.sock:ro"]
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+    labels:
+      agentplaza.project: ${PLAZA_PROJECT:-plaza}
+    restart: unless-stopped
+  web:
+    # 웹 콘솔(React 19 정적 빌드, 비루트 nginx). Traefik 이 같은 오리진에서 / 를 서빙하고 /api 등은 api 로 보낸다
+    build: { context: ./web }
+    image: wise-agentplaza-web:${APP_ENV:-local}
+    environment:
+      APPS_ORIGIN: ${PUBLIC_APPS_URL:-http://127.0.0.1:8092}
+    read_only: true
+    tmpfs: ["/tmp", "/var/cache/nginx:uid=101,gid=101", "/etc/nginx/conf.d:uid=101,gid=101"]
+    labels:
+      agentplaza.project: ${PLAZA_PROJECT:-plaza}
+      traefik.enable: "true"
+      traefik.docker.network: ${PLAZA_PROJECT:-plaza}_default
+      traefik.http.routers.plaza-web.entrypoints: web
+      traefik.http.routers.plaza-web.rule: PathPrefix(`/`)
+      traefik.http.routers.plaza-web.priority: "1"
+      traefik.http.services.plaza-web.loadbalancer.server.port: "8080"
+    restart: unless-stopped
+
+  otel-collector:
+    # P06: OTLP 수집(트레이스·메트릭·로그). 기본은 debug 내보내기 — 백엔드(Opik·SigNoz)는 exporters 만 바꾼다
+    image: otel/opentelemetry-collector:latest
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes: ["./ops/otel-collector.yaml:/etc/otelcol/config.yaml:ro"]
+    labels:
+      agentplaza.project: ${PLAZA_PROJECT:-plaza}
+    restart: unless-stopped
+volumes:
+  appdata:
+  trivycache:
+  bifrostdata:

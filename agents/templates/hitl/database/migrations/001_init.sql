@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS actions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  action TEXT NOT NULL,
+  target TEXT,
+  approval_id TEXT NOT NULL,
+  executed_at REAL NOT NULL
+);

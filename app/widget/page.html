@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<style>
+  :root { --primary:#3F51E5; --bg:#F6F7FB; --card:#fff; --border:#D9DCE5; --text:#222; --sub:#666B7A; }
+  * { box-sizing: border-box; } html, body { margin:0; height:100%; font:14px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--text); background:var(--bg); }
+  .wrap { display:flex; flex-direction:column; height:100%; }
+  header { display:flex; align-items:center; gap:8px; padding:10px 12px; background:var(--card); border-bottom:1px solid var(--border); }
+  header h1 { font-size:15px; margin:0 auto 0 0; }
+  button { font:inherit; border-radius:6px; border:1px solid var(--border); background:var(--card); padding:6px 10px; cursor:pointer; min-width:32px; min-height:32px; }
+  .primary { background:var(--primary); border-color:var(--primary); color:#fff; }
+  #log { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px; list-style:none; margin:0; }
+  .msg { max-width:85%; padding:8px 10px; border-radius:12px; white-space:pre-wrap; word-break:break-word; }
+  .me { align-self:flex-end; background:var(--primary); color:#fff; }
+  .bot { align-self:flex-start; background:var(--card); border:1px solid var(--border); }
+  .note { align-self:center; color:var(--sub); font-size:12px; }
+  form { display:flex; gap:8px; padding:10px; background:var(--card); border-top:1px solid var(--border); }
+  input { flex:1; font:inherit; padding:8px; border:1px solid var(--border); border-radius:6px; }
+  :focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1>__TITLE__</h1><button type="button" id="close" aria-label="닫기">×</button></header>
+  <ul id="log" aria-live="polite" aria-label="대화"><li class="msg bot">__GREETING__</li></ul>
+  <form id="f"><label for="q" style="position:absolute;left:-9999px">메시지</label>
+    <input id="q" autocomplete="off" placeholder="메시지를 입력하세요" required maxlength="4000">
+    <button class="primary" id="send">보내기</button></form>
+</div>
+<script src="/widget/__ID__/app.js"></script>
+</body>
+</html>

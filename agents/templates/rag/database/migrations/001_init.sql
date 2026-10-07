@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS documents (
+  doc_id TEXT PRIMARY KEY,
+  title TEXT NOT NULL
+);
+CREATE VIRTUAL TABLE IF NOT EXISTS chunks USING fts5(doc_id UNINDEXED, title, chunk_no UNINDEXED, body);

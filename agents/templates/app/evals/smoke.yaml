@@ -1,0 +1,9 @@
+# plaza test 시나리오(D4-05·D10-05): capability 를 직접 호출해 결과를 확인한다. 게시 전 필수 시험의 출발점.
+- id: create-then-list
+  capability: manage
+  args: {action: create, title: smoke}
+  expect: {keys: [id]}
+- id: list
+  capability: manage
+  args: {action: list}
+  expect: {type: list, contains: [smoke]}

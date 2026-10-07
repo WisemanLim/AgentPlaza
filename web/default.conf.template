@@ -1,0 +1,10 @@
+server {
+  listen 8080;
+  root /usr/share/nginx/html;
+  # 콘솔은 다른 사이트에 프레임으로 들어가지 않는다. Addon 화면은 apps 오리진에서만 프레임 허용.
+  add_header Content-Security-Policy "frame-ancestors 'none'; frame-src 'self' ${APPS_ORIGIN}" always;
+  add_header X-Content-Type-Options nosniff always;
+  add_header Referrer-Policy same-origin always;
+  location /assets/ { expires 7d; }
+  location / { try_files $uri /index.html; }
+}

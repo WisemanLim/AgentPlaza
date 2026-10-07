@@ -1,0 +1,6 @@
+# extras/redis — 선택 인프라 (scaffold --extras redis). make 가 compose/*.yml 을 자동 포함한다.
+services:
+  redis:
+    # PRD P03·P05: Redis(RSALv2/SSPLv1/AGPLv3) 대신 Valkey(BSD-3, Redis 프로토콜 호환)
+    image: valkey/valkey:8-alpine
+    ports: ["${BIND_HOST:-127.0.0.1}:${REDIS_PORT:-6379}:6379"]

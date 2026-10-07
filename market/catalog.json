@@ -1,0 +1,458 @@
+{
+  "schema": "agentplaza/catalog/v1",
+  "name": "AgentPlaza 기본 카탈로그",
+  "listings": [
+    {
+      "id": "board",
+      "version": "1.0.0",
+      "type": "app",
+      "name": {
+        "ko": "사내 게시판",
+        "en": "Board"
+      },
+      "description": {
+        "ko": "게시글 등록·조회·삭제 화면과 API",
+        "en": "Posts CRUD with a UI"
+      },
+      "categories": [
+        "common-utility"
+      ],
+      "industry": "-",
+      "work": "W19",
+      "domain": "common",
+      "tags": [
+        "board",
+        "crud"
+      ],
+      "publisher": {
+        "id": "agentplaza",
+        "name": "AgentPlaza",
+        "verified": true
+      },
+      "license": "MIT",
+      "trust": "official",
+      "pricing": "free",
+      "capabilities": [
+        "manage"
+      ],
+      "approval": [],
+      "required_env": [],
+      "permissions": {
+        "egress": [],
+        "docker": false,
+        "dataClassification": "internal"
+      },
+      "hasFrontend": true,
+      "compat": {
+        "topologies": [
+          "T1",
+          "T2",
+          "T3",
+          "T5"
+        ]
+      },
+      "source": {
+        "type": "zip",
+        "path": "artifacts/board-1.0.0.zip",
+        "sha256": "95054d7f1d35c33b8bac57fb09378e088d32650139c8a55ed4bdb45e660f73f8"
+      }
+    },
+    {
+      "id": "knowledge-rag",
+      "version": "1.0.0",
+      "type": "rag",
+      "name": {
+        "ko": "지식 검색(RAG)",
+        "en": "Knowledge RAG"
+      },
+      "description": {
+        "ko": "문서 수집·BM25 검색·인용 답변",
+        "en": "Ingest, search and cite"
+      },
+      "categories": [
+        "common-rag"
+      ],
+      "industry": "-",
+      "work": "W03",
+      "domain": "common",
+      "tags": [
+        "rag",
+        "search",
+        "citation"
+      ],
+      "publisher": {
+        "id": "agentplaza",
+        "name": "AgentPlaza",
+        "verified": true
+      },
+      "license": "MIT",
+      "trust": "official",
+      "pricing": "free",
+      "capabilities": [
+        "ingest",
+        "search",
+        "ask"
+      ],
+      "approval": [],
+      "required_env": [],
+      "permissions": {
+        "egress": [],
+        "docker": false,
+        "dataClassification": "confidential"
+      },
+      "hasFrontend": false,
+      "compat": {
+        "topologies": [
+          "T1",
+          "T2",
+          "T3",
+          "T5"
+        ]
+      },
+      "source": {
+        "type": "zip",
+        "path": "artifacts/knowledge-rag-1.0.0.zip",
+        "sha256": "93f7f652c971601ff694c2f3bade3ccbca00260b7054d04d72d41048806afa90"
+      }
+    },
+    {
+      "id": "pii-guard",
+      "version": "1.0.0",
+      "type": "reviewer",
+      "name": {
+        "ko": "개인정보 검토",
+        "en": "PII Guard"
+      },
+      "description": {
+        "ko": "PII·프롬프트 인젝션 검토와 마스킹",
+        "en": "PII and injection review"
+      },
+      "categories": [
+        "ict-governance"
+      ],
+      "industry": "J",
+      "work": "W06",
+      "domain": "governance",
+      "tags": [
+        "pii",
+        "guardrail",
+        "isms-p"
+      ],
+      "publisher": {
+        "id": "agentplaza",
+        "name": "AgentPlaza",
+        "verified": true
+      },
+      "license": "MIT",
+      "trust": "official",
+      "pricing": "free",
+      "capabilities": [
+        "review"
+      ],
+      "approval": [],
+      "required_env": [],
+      "permissions": {
+        "egress": [],
+        "docker": false,
+        "dataClassification": "internal"
+      },
+      "hasFrontend": false,
+      "compat": {
+        "topologies": [
+          "T1",
+          "T2",
+          "T3",
+          "T5"
+        ]
+      },
+      "source": {
+        "type": "zip",
+        "path": "artifacts/pii-guard-1.0.0.zip",
+        "sha256": "e03d1880e96e319e83a5493025dd1c105dbb34472bebad8f23bda8e94422a474"
+      }
+    },
+    {
+      "id": "calculator",
+      "version": "1.0.0",
+      "type": "execution",
+      "name": {
+        "ko": "계산기",
+        "en": "Calculator"
+      },
+      "description": {
+        "ko": "안전한 산술식 계산(AST 화이트리스트)",
+        "en": "Safe arithmetic"
+      },
+      "categories": [
+        "common-utility"
+      ],
+      "industry": "-",
+      "work": "W19",
+      "domain": "common",
+      "tags": [
+        "math"
+      ],
+      "publisher": {
+        "id": "agentplaza",
+        "name": "AgentPlaza",
+        "verified": true
+      },
+      "license": "MIT",
+      "trust": "official",
+      "pricing": "free",
+      "capabilities": [
+        "calculate"
+      ],
+      "approval": [],
+      "required_env": [],
+      "permissions": {
+        "egress": [],
+        "docker": false,
+        "dataClassification": "internal"
+      },
+      "hasFrontend": false,
+      "compat": {
+        "topologies": [
+          "T1",
+          "T2",
+          "T3",
+          "T5"
+        ]
+      },
+      "source": {
+        "type": "zip",
+        "path": "artifacts/calculator-1.0.0.zip",
+        "sha256": "e69dad2d6d67dcb05c280ca7ddf9fa73026ceb8a1432568aa52969d0881e7ca3"
+      }
+    },
+    {
+      "id": "user-memory",
+      "version": "1.0.0",
+      "type": "memory",
+      "name": {
+        "ko": "사용자 기억",
+        "en": "User Memory"
+      },
+      "description": {
+        "ko": "사실·선호 기억과 삭제권",
+        "en": "Facts with right to erasure"
+      },
+      "categories": [
+        "common-assistant"
+      ],
+      "industry": "-",
+      "work": "W01",
+      "domain": "common",
+      "tags": [
+        "memory",
+        "personalization"
+      ],
+      "publisher": {
+        "id": "agentplaza",
+        "name": "AgentPlaza",
+        "verified": true
+      },
+      "license": "MIT",
+      "trust": "official",
+      "pricing": "free",
+      "capabilities": [
+        "remember",
+        "recall",
+        "forget"
+      ],
+      "approval": [],
+      "required_env": [],
+      "permissions": {
+        "egress": [],
+        "docker": false,
+        "dataClassification": "confidential"
+      },
+      "hasFrontend": false,
+      "compat": {
+        "topologies": [
+          "T1",
+          "T2",
+          "T3",
+          "T5"
+        ]
+      },
+      "source": {
+        "type": "zip",
+        "path": "artifacts/user-memory-1.0.0.zip",
+        "sha256": "c134c9bb47b36604555e6abd2cb9393c9bc97f7c894c8eac6ec2cf2d279893a5"
+      }
+    },
+    {
+      "id": "ops-approval",
+      "version": "1.0.0",
+      "type": "hitl",
+      "name": {
+        "ko": "승인 작업 실행",
+        "en": "Ops Approval"
+      },
+      "description": {
+        "ko": "휴먼 승인 후에만 실행되는 운영 작업",
+        "en": "Ops actions after approval"
+      },
+      "categories": [
+        "common-workflow"
+      ],
+      "industry": "-",
+      "work": "W04",
+      "domain": "platform",
+      "tags": [
+        "hitl",
+        "approval"
+      ],
+      "publisher": {
+        "id": "agentplaza",
+        "name": "AgentPlaza",
+        "verified": true
+      },
+      "license": "MIT",
+      "trust": "official",
+      "pricing": "free",
+      "capabilities": [
+        "execute_action",
+        "history"
+      ],
+      "approval": [
+        "execute_action"
+      ],
+      "required_env": [],
+      "permissions": {
+        "egress": [],
+        "docker": false,
+        "dataClassification": "internal"
+      },
+      "hasFrontend": false,
+      "compat": {
+        "topologies": [
+          "T1",
+          "T2",
+          "T3",
+          "T5"
+        ]
+      },
+      "source": {
+        "type": "zip",
+        "path": "artifacts/ops-approval-1.0.0.zip",
+        "sha256": "4472fc27b771f09c7d925ef557c628cad015d4b9562a8232ffd3f4ad2bc00304"
+      }
+    },
+    {
+      "id": "text-tools",
+      "version": "1.0.0",
+      "type": "service",
+      "name": {
+        "ko": "텍스트 도구",
+        "en": "Text Tools"
+      },
+      "description": {
+        "ko": "변환·단어 수·요약(LLM 있으면 사용)",
+        "en": "Transform, count, summarize"
+      },
+      "categories": [
+        "common-docintel"
+      ],
+      "industry": "-",
+      "work": "W17",
+      "domain": "docintel",
+      "tags": [
+        "text",
+        "summarize"
+      ],
+      "publisher": {
+        "id": "agentplaza",
+        "name": "AgentPlaza",
+        "verified": true
+      },
+      "license": "MIT",
+      "trust": "official",
+      "pricing": "free",
+      "capabilities": [
+        "process"
+      ],
+      "approval": [],
+      "required_env": [],
+      "permissions": {
+        "egress": [],
+        "docker": false,
+        "dataClassification": "internal"
+      },
+      "hasFrontend": false,
+      "compat": {
+        "topologies": [
+          "T1",
+          "T2",
+          "T3",
+          "T5"
+        ]
+      },
+      "source": {
+        "type": "zip",
+        "path": "artifacts/text-tools-1.0.0.zip",
+        "sha256": "585767d85db7d137306c6395f8fe37c1dd4d36b1288cd8c7f017028007c10d6a"
+      }
+    },
+    {
+      "id": "http-tool",
+      "version": "1.0.0",
+      "type": "tool-proxy",
+      "name": {
+        "ko": "HTTP 도구 프록시",
+        "en": "HTTP Tool Proxy"
+      },
+      "description": {
+        "ko": "외부 REST API 1개를 도구로",
+        "en": "Wrap one REST API"
+      },
+      "categories": [
+        "common-utility"
+      ],
+      "industry": "-",
+      "work": "W19",
+      "domain": "common",
+      "tags": [
+        "http",
+        "proxy"
+      ],
+      "publisher": {
+        "id": "agentplaza",
+        "name": "AgentPlaza",
+        "verified": true
+      },
+      "license": "MIT",
+      "trust": "official",
+      "pricing": "free",
+      "capabilities": [
+        "call"
+      ],
+      "approval": [],
+      "required_env": [
+        "TOOL_BASE_URL"
+      ],
+      "permissions": {
+        "egress": [
+          "${TOOL_BASE_URL}"
+        ],
+        "docker": false,
+        "dataClassification": "internal"
+      },
+      "hasFrontend": false,
+      "compat": {
+        "topologies": [
+          "T1",
+          "T2",
+          "T3",
+          "T5"
+        ]
+      },
+      "source": {
+        "type": "zip",
+        "path": "artifacts/http-tool-1.0.0.zip",
+        "sha256": "6335f325b9d639ce2c42cd108bce4d390619935f2fe7e648a860ad6964b1758f"
+      }
+    }
+  ]
+}

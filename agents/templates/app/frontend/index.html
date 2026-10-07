@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{AGENT_NAME}}</title>
+  <style>
+    :root { --primary: #3F51E5; --bg: #F6F7FB; --card: #fff; --border: #D9DCE5; --text: #222; --sub: #666B7A; }
+    @media (prefers-color-scheme: dark) {
+      :root { --primary: #7C8CFF; --bg: #0F1220; --card: #181B2E; --border: #2A2E48; --text: #E6E8F2; --sub: #9AA0B4; }
+    }
+    body { margin: 0; font: 14px/1.5 Pretendard, "Noto Sans KR", system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    main { max-width: 720px; padding: 16px; }
+    form, li { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+    ul { list-style: none; padding: 0; display: grid; gap: 8px; }
+    label { display: block; color: var(--sub); margin-top: 8px; }
+    input, textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--border); border-radius: 6px; padding: 8px; }
+    button { margin-top: 8px; background: var(--primary); color: #fff; border: 0; border-radius: 6px; padding: 8px 14px; cursor: pointer; }
+    [role=alert] { color: #C92A2A; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>{{AGENT_NAME}}</h1>
+  <form id="f">
+    <label for="title">제목</label><input id="title" required>
+    <label for="body">내용</label><textarea id="body" rows="3"></textarea>
+    <button type="submit">등록</button>
+    <p id="err" role="alert"></p>
+  </form>
+  <h2>목록</h2>
+  <ul id="list" aria-live="polite"></ul>
+</main>
+<script>
+  // 상대 경로: 단독(M1) 은 / , 콘솔 iframe(M2) 은 /a/{id}/ui/ 아래에서 같은 코드로 동작한다.
+  const call = (payload) => fetch("api/invoke/manage", {method: "POST", headers: {"content-type": "application/json"},
+    body: JSON.stringify(payload)}).then(async r => { if (!r.ok) throw new Error((await r.json()).detail); return (await r.json()).result; });
+  const render = async () => {
+    const items = await call({action: "list"});
+    const ul = document.getElementById("list");
+    ul.replaceChildren(...items.map(i => Object.assign(document.createElement("li"), {textContent: `#${i.id} ${i.title}`})));
+    parent.postMessage({type: "plaza:resize", height: document.body.scrollHeight}, "*");
+  };
+  document.getElementById("f").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
+      await call({action: "create", title: title.value, body: body.value});
+      title.value = body.value = ""; err.textContent = ""; await render();
+    } catch (x) { err.textContent = x.message; }
+  });
+  render().catch(x => err.textContent = x.message);
+</script>
+</body>
+</html>

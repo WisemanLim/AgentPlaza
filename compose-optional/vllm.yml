@@ -1,0 +1,18 @@
+# 선택 오버레이 — 고성능 로컬 서빙(D1-02): vLLM(safetensors, NVIDIA GPU). 플랫폼에는 'OpenAI 호환 서버'로 등록:
+#   PUT /api/llm/servers/vllm {"base_url": "http://vllm:8000/v1", "local": true} → GET …/servers/vllm/models → POST /api/llm/models
+# Apple Silicon 은 GPU 컨테이너를 지원하지 않는다 — llama-server.yml(CPU) 또는 호스트 Ollama 를 쓴다(PRD R10).
+services:
+  vllm:
+    image: vllm/vllm-openai:latest
+    command: ["--model", "${VLLM_MODEL:-Qwen/Qwen3-8B}", "--served-model-name", "${VLLM_SERVED_NAME:-qwen3-8b}", "--max-model-len", "32768"]
+    volumes: ["hf-cache:/root/.cache/huggingface"]
+    ipc: private
+    deploy:
+      resources:
+        reservations:
+          devices: [{ driver: nvidia, count: all, capabilities: [gpu] }]
+    labels:
+      agentplaza.project: ${PLAZA_PROJECT:-plaza}
+    restart: unless-stopped
+volumes:
+  hf-cache:
